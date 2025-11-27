@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/1/Downloads/web-application-development%20%281%29/app/%28auth%29/layout.tsx"],"sourcesContent":["import type React from \"react\"\nexport default function AuthLayout({\n  children,\n}: {\n  children: React.ReactNode\n}) {\n  return (\n    <div className=\"min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4\">\n      <div className=\"w-full max-w-md\">{children}</div>\n    </div>\n  )\n}\n"],"names":[],"mappings":";;;;;;AACe,SAAS,WAAW,EACjC,QAAQ,EAGT;IACC,qBACE,6WAAC;QAAI,WAAU;kBACb,cAAA,6WAAC;YAAI,WAAU;sBAAmB;;;;;;;;;;;AAGxC"}},
+    {"offset": {"line": 31, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/1/Downloads/web-application-development%20%281%29/node_modules/.pnpm/next%4016.0.3_react-dom%4019.2.0_react%4019.2.0__react%4019.2.0/node_modules/next/src/server/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.ts"],"sourcesContent":["module.exports = (\n  require('../../module.compiled') as typeof import('../../module.compiled')\n).vendored['react-rsc']!.ReactJsxDevRuntime\n"],"names":["module","exports","require","vendored","ReactJsxDevRuntime"],"mappings":"AAAAA,OAAOC,OAAO,GACZC,QAAQ,uMACRC,QAAQ,CAAC,YAAY,CAAEC,kBAAkB","ignoreList":[0]}}]
+}

@@ -13,26 +13,16 @@ export const authOptions: AuthOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) {
-                    return null
-                }
+                if (!credentials?.email || !credentials?.password) return null
 
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email as string },
+                    where: { email: credentials.email },
                 })
 
-                if (!user || !user.password) {
-                    return null
-                }
+                if (!user || !user.password) return null
 
-                const isPasswordValid = await bcrypt.compare(
-                    credentials.password as string,
-                    user.password
-                )
-
-                if (!isPasswordValid) {
-                    return null
-                }
+                const isValid = await bcrypt.compare(credentials.password, user.password)
+                if (!isValid) return null
 
                 return {
                     id: user.id,
@@ -43,29 +33,24 @@ export const authOptions: AuthOptions = {
             },
         }),
     ],
-    pages: {
-        signIn: "/login",
-        error: "/login",
-    },
+    pages: { signIn: "/login", error: "/login" },
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.role = (user as any).role
                 token.id = user.id
+                token.role = (user as any).role
             }
             return token
         },
         async session({ session, token }) {
             if (session.user) {
-                ;(session.user as any).role = token.role
                 ;(session.user as any).id = token.id
+                ;(session.user as any).role = token.role
             }
             return session
         },
     },
-    session: {
-        strategy: "jwt",
-    },
+    session: { strategy: "jwt" },
 }
 
 export default NextAuth(authOptions)

@@ -107,9 +107,13 @@ model Doctor {
 
   specialization String
   licenseNumber  String
-  experience     Int // Years of experience
+  experience     Int     @default(0) // Years of experience
   bio            String?
-  availableHours String  @default("09:00-17:00") // JSON format
+
+  // Updated availability fields
+  availableFrom String   @default("09:00")
+  availableTo   String   @default("17:00")
+  availableDays String[] @default([])
 
   // Relations
   services      Service[]
@@ -167,11 +171,10 @@ model Patient {
 
 // Medical Services offered by clinic
 model Service {
-  id       String @id @default(cuid())
+  id       String   @id @default(cuid())
   clinicId String
-  clinic   Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  clinic   Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  doctors  Doctor[]
 
   name        String
   description String?
@@ -186,7 +189,6 @@ model Service {
   updatedAt DateTime @updatedAt
 
   @@index([clinicId])
-  @@index([doctorId])
 }
 
 // Appointments

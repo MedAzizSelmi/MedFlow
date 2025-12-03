@@ -1,67 +1,49 @@
+import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireAuth } from "@/lib/auth-utils"
-import { type NextRequest, NextResponse } from "next/server"
-import bcrypt from "bcryptjs"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/auth"
 
-export async function GET(req: NextRequest) {
-  try {
-    const session = await requireAuth()
+export async function GET() {
+    try {
+        const session = await getServerSession(authOptions)
+        const userRole = (session?.user as any)?.role
 
-    const doctors = await prisma.doctor.findMany({
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            firstName: true,
-            lastName: true,
-            phone: true,
-          },
-        },
-        services: true,
-      },
-    })
+        // Allow ADMIN, DOCTOR, RECEPTIONIST, and PATIENT to view doctors
+        if (!session || !["ADMIN", "DOCTOR", "RECEPTIONIST", "PATIENT"].includes(userRole)) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        }
 
-    return NextResponse.json(doctors)
-  } catch (error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-}
+        const userId = (session.user as any).id
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { clinicId: true },
+        })
 
-export async function POST(req: NextRequest) {
-  try {
-    const session = await requireAuth()
-    const data = await req.json()
+        const clinicId = user?.clinicId
+        if (!clinicId) {
+            return NextResponse.json([], { status: 200 })
+        }
 
-    const hashedPassword = await bcrypt.hash(data.password || "password123", 10)
+        const doctors = await prisma.doctor.findMany({
+            where: { clinicId },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        phone: true,
+                        isActive: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: "desc" },
+        })
 
-    const user = await prisma.user.create({
-      data: {
-        email: data.email,
-        password: hashedPassword,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: "DOCTOR",
-        phone: data.phone,
-      },
-    })
-
-    const clinic = await prisma.clinic.findFirst()
-    if (!clinic) throw new Error("No clinic found")
-
-    const doctor = await prisma.doctor.create({
-      data: {
-        userId: user.id,
-        clinicId: clinic.id,
-        specialization: data.specialization,
-        licenseNumber: data.licenseNumber,
-        experience: data.experience,
-        bio: data.bio,
-      },
-    })
-
-    return NextResponse.json(doctor, { status: 201 })
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to create doctor" }, { status: 400 })
-  }
+        return NextResponse.json(doctors)
+    } catch (error) {
+        console.error("GET /api/doctors error", error)
+        return NextResponse.json({ error: "Server error" }, { status: 500 })
+    }
 }

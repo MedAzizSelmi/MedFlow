@@ -1,6 +1,15 @@
-.next/
+# dependencies
 node_modules/
-dist/
-out/
 .pnpm-store/
+.yarn/
+.npm/
 
+# Next.js
+.next/
+out/
+dist/
+
+# env
+.env
+.env.local
+.env.*.local

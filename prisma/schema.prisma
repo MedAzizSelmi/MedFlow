@@ -171,10 +171,9 @@ model Patient {
 
 // Medical Services offered by clinic
 model Service {
-  id       String   @id @default(cuid())
+  id       String @id @default(cuid())
   clinicId String
-  clinic   Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
-  doctors  Doctor[]
+  clinic   Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
 
   name        String
   description String?
@@ -184,9 +183,9 @@ model Service {
 
   // Relations
   appointments Appointment[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  doctors      Doctor[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@index([clinicId])
 }

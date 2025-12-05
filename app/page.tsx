@@ -9,8 +9,15 @@ export default async function HomePage() {
     if (session?.user) {
         if ((session.user as any).role === "PATIENT") {
             redirect("/patient/dashboard")
-        } else {
-            redirect("/dashboard")
+        }
+        if ((session.user as any).role === "ADMIN") {
+            redirect("/admin/dashboard")
+        }
+        if ((session.user as any).role === "DOCTOR") {
+            redirect("/doctor/dashboard")
+        }
+        if ((session.user as any).role === "RECEPTIONIST") {
+            redirect("/receptionist/dashboard")
         }
     }
 
